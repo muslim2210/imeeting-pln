@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// ===============================
+/// AUTH & ROLE
+/// ===============================
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+/// ===============================
+/// MASTER DATA
+/// (bisa sinkron dari API eksternal ke DB lokal)
+/// ===============================
+model MasterUnit {
+  id          String      @id
+  officeName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+}
+
+model MasterMeetingRoom {
+  id          String      @id
+  officeId    String
+  officeName  String
+  roomName    String
+  capacity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings   Booking[]
+}
+
+model MasterJenisKonsumsi {
+  id        String      @id
+  name      String
+  maxPrice  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookingKonsumsi BookingKonsumsi[]
+}
+
+/// ===============================
+/// BOOKING DATA
+/// ===============================
+model Booking {
+  id            String      @id
+  unitId        String
+  meetingRoomId String
+  userId        Int
+  tanggal       DateTime
+  waktuMulai    String   // format "HH:mm"
+  waktuSelesai  String
+  jumlahPeserta Int
+  nominal       Int      @default(0) // auto diisi dari konsumsi rules
+  createdAt     DateTime @default(now())
+
+  unit        MasterUnit        @relation(fields: [unitId], references: [id])
+  meetingRoom MasterMeetingRoom @relation(fields: [meetingRoomId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
+
+  konsumsi    BookingKonsumsi[]
+}
+
+/// ===============================
+/// RELASI BOOKING ↔ JENIS KONSUMSI
+/// (bisa lebih dari 1 konsumsi sesuai rules)
+/// ===============================
+model BookingKonsumsi {
+  id              String             @id @default(uuid())
+  bookingId       String
+  jenisKonsumsiId String
+
+  booking        Booking             @relation(fields: [bookingId], references: [id])
+  jenisKonsumsi  MasterJenisKonsumsi @relation(fields: [jenisKonsumsiId], references: [id])
+}
+
