@@ -39,6 +39,7 @@ export type User = {
   email: string;
   password: string;
   role: string; // ADMIN / USER
+  token: string;
   createdAt: string; // format yyyy-mm-dd
   updatedAt: string; // format yyyy-mm-dd
 };
@@ -48,3 +49,10 @@ export type BookingKonsumsi = {
   bookingId: string;
   jenisKonsumsiId: string;
 };
+
+export interface AuthContextType {
+  user: User | null;
+  login: (userData: User) => void;
+  logout: () => void;
+  loading: boolean;
+}
