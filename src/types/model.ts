@@ -56,3 +56,31 @@ export interface AuthContextType {
   logout: () => void;
   loading: boolean;
 }
+
+export interface SummaryConsumption {
+  id: string;
+  name: string;
+  totalPackage: number;
+  totalPrice: number;
+}
+
+export interface SummaryRoom {
+  id: string;
+  roomName: string;
+  capacity: number;
+  averageOccupancyPerMonth: number;
+  consumptions: SummaryConsumption[];
+}
+
+export interface SummaryOffice {
+  id: string;
+  officeName: string;
+  rooms: SummaryRoom[];
+}
+
+export interface SummaryBooking {
+  id: string;
+  period: string;
+  createdAt: string; // ISO string dari Date
+  offices: SummaryOffice[];
+}

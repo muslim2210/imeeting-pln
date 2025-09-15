@@ -98,3 +98,44 @@ model BookingKonsumsi {
   jenisKonsumsi  MasterJenisKonsumsi @relation(fields: [jenisKonsumsiId], references: [id])
 }
 
+/// ===============================
+/// SUMMARY DATA (DASHBOARD)
+/// ===============================
+model SummaryBookings {
+  id        String             @id
+  period    String
+  createdAt DateTime        @default(now())
+
+  offices   SummaryOffice[]
+}
+
+model SummaryOffice {
+  id         String              @id
+  officeName String
+  summaryId  String
+  summary    SummaryBookings  @relation(fields: [summaryId], references: [id])
+
+  rooms      SummaryRoom[]
+}
+
+model SummaryRoom {
+  id                       String             @id
+  roomName                 String
+  capacity                 Int
+  averageOccupancyPerMonth Int
+  officeId                 String
+  office                   SummaryOffice   @relation(fields: [officeId], references: [id])
+
+  consumptions             SummaryConsumption[]
+}
+
+model SummaryConsumption {
+  id           String             @id 
+  name         String
+  totalPackage Int
+  totalPrice   Int
+  roomId       String
+  room         SummaryRoom     @relation(fields: [roomId], references: [id])
+}
+
+

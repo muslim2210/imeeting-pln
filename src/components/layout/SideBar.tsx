@@ -12,9 +12,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed top-16 bottom-0 left-0 h-screen w-16 bg-white border-r flex flex-col items-center md:items-start py-4 shadow-sm">
+    <aside className="fixed top-16 bottom-0 left-0 h-screen w-16 bg-white border-r flex flex-col items-center md:items-start py-4 shadow-md">
       {/* Menu */}
-      <nav className="flex flex-col gap-3 w-full mt-5">
+      <nav className="flex flex-col gap-3 w-full mt-5 px-3">
         {menus.map((menu) => {
           const Icon = menu.icon;
           return (
@@ -25,11 +25,11 @@ export default function Sidebar() {
               className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all
                 ${
                   active === menu.href
-                    ? "bg-sky-100 text-sky-700"
+                    ? "bg-sky-700 text-white px-2"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
             >
-              <Icon className="h-7 w-7" />
+              <Icon className="h-5 w-5" />
             </Link>
           );
         })}

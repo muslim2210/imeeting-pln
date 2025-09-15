@@ -5,6 +5,7 @@ CREATE TABLE `User` (
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `role` ENUM('ADMIN', 'USER') NOT NULL DEFAULT 'USER',
+    `token` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -71,6 +72,46 @@ CREATE TABLE `BookingKonsumsi` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `SummaryBookings` (
+    `id` VARCHAR(191) NOT NULL,
+    `period` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SummaryOffice` (
+    `id` VARCHAR(191) NOT NULL,
+    `officeName` VARCHAR(191) NOT NULL,
+    `summaryId` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SummaryRoom` (
+    `id` VARCHAR(191) NOT NULL,
+    `roomName` VARCHAR(191) NOT NULL,
+    `capacity` INTEGER NOT NULL,
+    `averageOccupancyPerMonth` INTEGER NOT NULL,
+    `officeId` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SummaryConsumption` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `totalPackage` INTEGER NOT NULL,
+    `totalPrice` INTEGER NOT NULL,
+    `roomId` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Booking` ADD CONSTRAINT `Booking_unitId_fkey` FOREIGN KEY (`unitId`) REFERENCES `MasterUnit`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -85,3 +126,12 @@ ALTER TABLE `BookingKonsumsi` ADD CONSTRAINT `BookingKonsumsi_bookingId_fkey` FO
 
 -- AddForeignKey
 ALTER TABLE `BookingKonsumsi` ADD CONSTRAINT `BookingKonsumsi_jenisKonsumsiId_fkey` FOREIGN KEY (`jenisKonsumsiId`) REFERENCES `MasterJenisKonsumsi`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SummaryOffice` ADD CONSTRAINT `SummaryOffice_summaryId_fkey` FOREIGN KEY (`summaryId`) REFERENCES `SummaryBookings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SummaryRoom` ADD CONSTRAINT `SummaryRoom_officeId_fkey` FOREIGN KEY (`officeId`) REFERENCES `SummaryOffice`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SummaryConsumption` ADD CONSTRAINT `SummaryConsumption_roomId_fkey` FOREIGN KEY (`roomId`) REFERENCES `SummaryRoom`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

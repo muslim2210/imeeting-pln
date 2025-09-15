@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { PrismaClient } from "@prisma/client";
 import axios from "axios";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,10 +9,8 @@ async function main() {
   const unitsUrl = process.env.API_MASTER_UNIT;
   const roomsUrl = process.env.API_MASTER_ROOM;
   const konsumsiUrl = process.env.API_MASTER_KONSUMSI;
+  const summaryUrl = process.env.API_SUMMARY_BOOKINGS;
 
-  console.log("unitsUrl:", process.env.API_MASTER_UNIT);
-  console.log("roomsUrl:", process.env.API_MASTER_ROOM);
-  console.log("konsumsiUrl:", process.env.API_MASTER_KONSUMSI);
 
 
   if (!unitsUrl || !roomsUrl || !konsumsiUrl) {
@@ -59,6 +57,92 @@ async function main() {
       create: { id: String(k.id), name: k.name, maxPrice: k.maxPrice },
     });
   }
+
+ // ================================
+// Summary Bookings (from API)
+// ================================
+if (!summaryUrl) {
+  throw new Error("Environment variable API_SUMMARY_BOOKINGS belum diset!");
+}
+
+const summaries = await axios.get(summaryUrl);
+
+for (const s of summaries.data) {
+  // Buat SummaryBookings
+  await prisma.summaryBookings.upsert({
+    where: { id: String(s.id) },
+    update: {
+      period: s.period,
+      createdAt: new Date(s.createdAt),
+    },
+    create: {
+      id: String(s.id),
+      period: s.period,
+      createdAt: new Date(s.createdAt),
+    },
+  });
+
+  // Loop offices
+  for (const o of s.data) {
+    const officeId = `${s.id}-${o.officeName}`; // gabungan biar unik
+
+    await prisma.summaryOffice.upsert({
+      where: { id: officeId },
+      update: { officeName: o.officeName },
+      create: {
+        id: officeId,
+        officeName: o.officeName,
+        summaryId: String(s.id),
+      },
+    });
+
+    // Loop rooms
+    for (const r of o.detailSummary) {
+      const roomId = `${officeId}-${r.roomName}`;
+
+      await prisma.summaryRoom.upsert({
+        where: { id: roomId },
+        update: {
+          roomName: r.roomName,
+          capacity: Number(r.capacity),
+          averageOccupancyPerMonth: Number(r.averageOccupancyPerMonth),
+        },
+        create: {
+          id: roomId,
+          roomName: r.roomName,
+          capacity: Number(r.capacity),
+          averageOccupancyPerMonth: Number(r.averageOccupancyPerMonth),
+          officeId: officeId,
+        },
+      });
+
+      // Loop consumptions
+      for (const c of r.totalConsumption) {
+        const consumptionId = `${roomId}-${c.name}`;
+
+        await prisma.summaryConsumption.upsert({
+          where: { id: consumptionId },
+          update: {
+            name: c.name,
+            totalPackage: Number(c.totalPackage),
+            totalPrice: Number(c.totalPrice),
+          },
+          create: {
+            id: consumptionId,
+            name: c.name,
+            totalPackage: Number(c.totalPackage),
+            totalPrice: Number(c.totalPrice),
+            roomId: roomId,
+          },
+        });
+      }
+    }
+  }
+}
+
+ 
+
+  
 }
 
 main()
