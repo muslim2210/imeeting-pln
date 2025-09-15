@@ -13,7 +13,7 @@ const RuangMeeting = () => {
         </div>
 
         <Link href='/meeting/new'>       
-          <Button variant='default' className='flex items-center gap-2 text-white'>
+          <Button className='flex items-center gap-2 text-white bg-primary'>
             <FaPlus size={16}/>
             <span className='text-xs'>Pesan Ruangan</span>
           </Button>

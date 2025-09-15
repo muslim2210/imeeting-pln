@@ -4,7 +4,7 @@ import { Home, FileText } from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar() {
-  const [active, setActive] = useState("meeting");
+  const [active, setActive] = useState("/");
 
   const menus = [
     { name: "Dashboard", icon: Home, href: "/" },
@@ -12,7 +12,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed top-16 bottom-0 left-0 h-screen w-16 bg-white border-r flex flex-col items-center md:items-start py-4 shadow-md">
+    <aside className="fixed top-12 bottom-0 left-0 h-screen w-16 bg-white border-r flex flex-col items-center md:items-start py-4 shadow-md">
       {/* Menu */}
       <nav className="flex flex-col gap-3 w-full mt-5 px-3">
         {menus.map((menu) => {
@@ -25,7 +25,7 @@ export default function Sidebar() {
               className={`flex items-center justify-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all
                 ${
                   active === menu.href
-                    ? "bg-sky-700 text-white px-2"
+                    ? "bg-primary text-white px-2"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
             >

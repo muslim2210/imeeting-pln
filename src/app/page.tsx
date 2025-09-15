@@ -1,9 +1,10 @@
 'use client';
 import React, { useEffect, useState, useMemo } from "react";
-import { FaChevronRight } from "react-icons/fa6";
+import { MdChevronRight } from "react-icons/md";
 import { SummaryBooking } from "@/types/model";
 import { Dashboard } from "@/components/layout/Dashboard";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Image from "next/image";
 
 // Ambil semua data summary booking
 const getSummaryBookings = async () => {
@@ -63,10 +64,11 @@ const HomePage = () => {
     <section className="px-2 md:px-4 py-12 mt-10 ml-0 md:ml-16">
       {/* Header */}
       <div className="flex flex-row gap-2 items-center justify-between">
-        <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Image src="/img/Settings.svg" alt="generation" width={50} height={50} priority className="h-5 w-5 mt-1" />
           <h1 className="text-xl font-semibold uppercase">Dashboard</h1>
         </div>
-        <FaChevronRight />
+        <MdChevronRight />
       </div>
       <hr className="my-2" />
 
@@ -74,6 +76,7 @@ const HomePage = () => {
       <div className="mb-6 flex flex-col gap-2">
         <label className="mr-2 font-medium text-sm text-gray-500">Periode :</label>
         <Select
+          value={period}
           onValueChange={(v) => setPeriod(v)}
         >
           <SelectTrigger className="w-[220px]">
@@ -94,11 +97,11 @@ const HomePage = () => {
 
       {/* Loading State */}
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           {Array.from({ length: 12 }).map((_, i) => (
             <div
               key={i}
-              className="w-[250px] h-[180px] bg-gray-200 animate-pulse rounded-lg"
+              className="max-w-full h-[180px] bg-gray-200 animate-pulse rounded-lg"
             ></div>
           ))}
         </div>

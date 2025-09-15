@@ -9,7 +9,7 @@ const Header = () => {
   const { user } = useAuth();
 
   return (
-    <header className="flex z-50 items-center justify-between bg-gradient-to-r from-blue-600 to-blue-800 shadow-sm px-3 md:px-5 py-3 fixed top-0 left-0 right-0">
+    <header className="flex z-50 items-center justify-between bg-gradient-to-r from-[#18A2BA] to-[#296377] shadow-sm px-3 md:px-5 py-2 fixed top-0 left-0 right-0">
       <div className="flex items-center space-x-4">
         <IoMenuOutline size={26} className='cursor-pointer block md:hidden'/>
         <Logo />
