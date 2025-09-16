@@ -5,19 +5,22 @@ import { SummaryBooking } from "@/types/model";
 import { Dashboard } from "@/components/layout/Dashboard";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
+import axios from "axios";
 
 // Ambil semua data summary booking
 const getSummaryBookings = async () => {
   try {
-    const res = await fetch(`${process.env.API_SUMMARY_BOOKINGS}`, { cache: "no-cache" });
-    if (!res.ok) throw new Error("Gagal fetch data");
-    return await res.json();
+    // URL diambil dari .env
+    const res = await axios.get(
+      process.env.NEXT_PUBLIC_API_SUMMARY_BOOKINGS as string
+    );
+    console.warn("📌 Data summary booking:", res);
+    return res.data; 
   } catch (err) {
     console.error("❌ Error fetching summary bookings:", err);
     throw err;
   }
 };
-
 // Generate periode 1 tahun penuh (Jan - Dec)
 // Fungsi untuk generate bulan jan-dec 2024
 const generatePeriods = () => {
