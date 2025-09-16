@@ -12,7 +12,7 @@ export const bookingSchema = z.object({
   unitId: z.string().min(1, "Unit harus dipilih"),
   meetingRoomId: z.string().min(1, "Ruang meeting harus dipilih"),
   capacity: z.number().min(1, "Kapasitas tidak valid"),
-
+  userId: z.string().min(1, "User harus dipilih"),
   tanggal: z.string().min(1, "Tanggal rapat wajib diisi"),
   waktuMulai: z.string().min(1, "Waktu mulai wajib diisi"),
   waktuSelesai: z.string().min(1, "Waktu selesai wajib diisi"),
@@ -62,5 +62,6 @@ export const defaultBookingValues: BookingForm = {
   jumlahPeserta: 1,
   jenisKonsumsi: [],
   nominal: 0,
+  userId: "",
   createdBy: "User", // atau bisa isi dynamic dari auth
 };

@@ -28,13 +28,13 @@ export type Booking = {
   waktuMulai: string; // format HH:mm
   waktuSelesai: string; // format HH:mm
   jumlahPeserta: number;
+  userId: string;
   jenisKonsumsi: JenisKonsumsi[];
   nominal: number;
-  createdBy: string; // user/admin
 };
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   password: string;

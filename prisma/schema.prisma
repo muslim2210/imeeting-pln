@@ -11,12 +11,11 @@ datasource db {
 /// AUTH & ROLE
 /// ===============================
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
   role      Role     @default(USER)
-  token     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -67,10 +66,11 @@ model MasterJenisKonsumsi {
 /// BOOKING DATA
 /// ===============================
 model Booking {
-  id            String      @id
+  id            String      @id @default(cuid())
   unitId        String
   meetingRoomId String
-  userId        Int
+  userId        String
+  capacity      Int
   tanggal       DateTime
   waktuMulai    String   // format "HH:mm"
   waktuSelesai  String

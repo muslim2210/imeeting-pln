@@ -12,7 +12,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed top-12 bottom-0 left-0 h-screen w-16 bg-white border-r flex flex-col items-center md:items-start py-4 shadow-md">
+    <aside className="hidden md:fixed top-12 bottom-0 left-0 h-screen w-16 bg-white border-r md:flex flex-col items-center md:items-start py-4 shadow-md">
       {/* Menu */}
       <nav className="flex flex-col gap-3 w-full mt-5 px-3">
         {menus.map((menu) => {

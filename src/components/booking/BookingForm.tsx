@@ -19,6 +19,10 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from 'date-fns'
 import { Booking, JenisKonsumsi, MeetingRoom, Unit } from '@/types/model'
+import { useAuthStore } from '@/store/useAuthStore'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+
 
 const formSchema = z.object({
   unitId: z.string().nonempty('Pilih Unit'),
@@ -29,13 +33,17 @@ const formSchema = z.object({
   jumlahPeserta: z.number().min(1, 'Jumlah peserta minimal 1'),
 });
 
-export function BookingForm({ createdBy }: { createdBy: string }) {
+export function BookingForm() {
   const [units, setUnits] = React.useState<Unit[]>([])
   const [rooms, setRooms] = React.useState<MeetingRoom[]>([])
   const [jenisKonsumsiMaster, setJenisKonsumsiMaster] = React.useState<JenisKonsumsi[]>([])
   const [capacity, setCapacity] = React.useState<number>(0)
   const [selectedJenis, setSelectedJenis] = React.useState<JenisKonsumsi[]>([])
   const [nominal, setNominal] = React.useState<number>(0)
+  const [loading, setLoading] = React.useState<boolean>(false)
+
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,26 +53,29 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
       tanggal: format(new Date(), 'yyyy-MM-dd'),
       waktuMulai: '',
       waktuSelesai: '',
-      jumlahPeserta: 0,
+      jumlahPeserta: undefined,
+
     },
   })
 
   React.useEffect(() => {
     // get master unit
-    axios.get('https://6666c7aea2f8516ff7a4e261.mockapi.io/api/dummy-data/masterOffice')
-      .then(res => setUnits(res.data))
+    axios.get('/api/master-units')
+      .then(res => setUnits(res.data.data))
     // get master jenis konsumsi
-    axios.get('https://6686cb5583c983911b03a7f3.mockapi.io/api/dummy-data/masterJenisKonsumsi')
-      .then(res => setJenisKonsumsiMaster(res.data))
+    axios.get('/api/master-jenis-konsumsi')
+      .then(res => setJenisKonsumsiMaster(res.data.data))
   }, [])
 
   // ambil rooms berdasarkan unit
   React.useEffect(() => {
     if (form.watch('unitId')) {
-      axios.get('https://6666c7aea2f8516ff7a4e261.mockapi.io/api/dummy-data/masterMeetingRooms')
+      axios.get('/api/master-meeting-rooms')
         .then(res => {
-          const filtered = res.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
+          console.warn("📌 Semua rooms:", res)
+          const filtered = res.data.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
           setRooms(filtered)
+          console.warn("📌 Rooms:", filtered)
         })
     }
   }, [form.watch('unitId')])
@@ -117,27 +128,53 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
   }, [form.watch('waktuMulai'), form.watch('waktuSelesai'), form.watch('jumlahPeserta'), jenisKonsumsiMaster])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (values.jumlahPeserta > capacity) {
-      alert('Jumlah peserta melebihi kapasitas ruangan')
-      return
-    }
-
-    const booking: Booking = {
-      unitId: values.unitId,
-      meetingRoomId: values.meetingRoomId,
-      capacity: capacity,
-      tanggal: values.tanggal,
-      waktuMulai: values.waktuMulai,
-      waktuSelesai: values.waktuSelesai,
-      jumlahPeserta: values.jumlahPeserta,
-      jenisKonsumsi: selectedJenis,
-      nominal: nominal,
-      createdBy,
-    }
-
-    console.log('Booking:', booking)
-    // axios.post('/api/bookings', booking)
+  if (values.jumlahPeserta > capacity) {
+    toast.error('Jumlah peserta melebihi kapasitas ruangan')
+    return
   }
+
+  const booking: Booking = {
+    unitId: values.unitId,
+    meetingRoomId: values.meetingRoomId,
+    capacity: capacity,
+    tanggal: values.tanggal,
+    waktuMulai: values.waktuMulai,
+    waktuSelesai: values.waktuSelesai,
+    jumlahPeserta: values.jumlahPeserta,
+    jenisKonsumsi: selectedJenis,
+    nominal: nominal,
+    userId: user?.id || '',
+  }
+
+  setLoading(true)
+  axios.post('/api/bookings', booking)
+    .then(res => {
+      if (res.data.success) {
+        toast.success('Booking berhasil disimpan')
+        form.reset()
+        setCapacity(0)
+        setSelectedJenis([])
+        setNominal(0)
+        router.push('/meeting')
+      } else {
+        toast.error(res.data.error || res.data.message || 'Gagal menyimpan booking')
+      }
+    })
+    .catch(err => {
+      const errData = err.response?.data
+      const errorMessage =
+        errData?.error ||
+        errData?.message ||
+        err.message ||
+        'Terjadi kesalahan'
+      toast.error(errorMessage)
+      console.error("Error:", errData || err.message)
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+}
+
 
   return (
     <Form {...form}>
@@ -192,15 +229,18 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
             )}
           />
         </div>
-
+        
+        {/* kapasitas */}
         <div>
           <FormLabel className='mb-2'>Kapasitas</FormLabel>
-          <Input value={capacity} readOnly className='w-full md:w-[250px]'/>
+          <Input value={capacity || 0} readOnly className='w-full md:w-[250px]'/>
+
         </div>
 
         <hr className='my-5'/>
         <FormLabel className='mb-3 text-md'>Informasi Rapat</FormLabel>
 
+        {/* tanggal, waktu mulai, waktu selesai, jumlah peserta */}
         <div className="flex flex-col gap-3 md:flex-row md:gap-5">
           <FormField
             control={form.control}
@@ -242,7 +282,8 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
             )}
           />
         </div>
-
+        
+        {/* jumlah peserta */}
         <FormField
           control={form.control}
           name="jumlahPeserta"
@@ -250,13 +291,31 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
             <FormItem>
               <FormLabel>Jumlah Peserta</FormLabel>
               <FormControl className='w-full md:w-[250px]'>
-                <Input type="number" placeholder="Masukkan Jumlah Peserta" {...field} />
+                <Input
+                type="number"
+                placeholder="Masukkan Jumlah Peserta"
+                // Kalau null/undefined → tampilkan string kosong
+                value={field.value ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '') {
+                    field.onChange(undefined); // kosong → undefined (biar zod validasi)
+                  } else {
+                    const n = Number(v);
+                    if (!Number.isNaN(n)) {
+                      field.onChange(n);
+                    }
+                  }
+                }}
+                onBlur={field.onBlur}
+              />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* jenis konsumsi */}
         <div>
           <FormLabel>Jenis Konsumsi</FormLabel>
           <div className="flex flex-col space-y-2 mt-2">
@@ -272,13 +331,21 @@ export function BookingForm({ createdBy }: { createdBy: string }) {
 
         <div>
           <FormLabel className='mb-2'>Nominal Konsumsi</FormLabel>
-          <Input className='w-full md:w-[250px]' value={`Rp. ${nominal.toLocaleString()}`} readOnly />
+          <Input className='w-full md:w-[250px]' value={`Rp. ${(isNaN(nominal) ? 0 : nominal).toLocaleString()}`}
+            readOnly
+          />
         </div>
         
         <hr className='my-5'/>
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="destructive">Batal</Button>
-          <Button type="submit">Simpan</Button>
+          <Button type="submit">
+            {loading ? (
+              'Loading...'
+            ) : (
+              'Simpan'
+            )}
+          </Button>
         </div>
       </form>
     </Form>

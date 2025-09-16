@@ -28,7 +28,7 @@ const FormRuangMeeting = () => {
       </div>
 
       {/* form */}
-      <BookingForm createdBy={''} />
+      <BookingForm  />
     </section>
   )
 }

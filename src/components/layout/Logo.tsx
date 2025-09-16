@@ -2,7 +2,7 @@ import * as React from "react"
 import Image from "next/image"
 
 
-const Logo = () => {
+const Logo = ({isLogin}: {isLogin?: boolean}) => {
   return (
     <div className="flex flex-row gap-2 items-center">
       <Image
@@ -13,7 +13,7 @@ const Logo = () => {
         priority
         className="h-auto w-[30px]"
       />
-      <h1 className="font-bold text-lg text-white">iMeeting</h1>
+      <h1 className={`font-bold text-lg ${!isLogin ? "text-white" : "text-black"}`}>iMeeting</h1>
     </div>
      
   )
