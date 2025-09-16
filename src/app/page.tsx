@@ -1,28 +1,50 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState, useMemo } from "react";
 import { MdChevronRight } from "react-icons/md";
-import { SummaryBooking } from "@/types/model";
+import { SummaryBooking, SummaryOffice, SummaryRoom, SummaryConsumption } from "@/types/model";
 import { Dashboard } from "@/components/layout/Dashboard";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
 import axios from "axios";
 
-// Ambil semua data summary booking
-const getSummaryBookings = async () => {
+// Ambil semua data summary booking dan mapping ke model kita
+const getSummaryBookings = async (): Promise<SummaryBooking[]> => {
   try {
-    // URL diambil dari .env
     const res = await axios.get(
       process.env.NEXT_PUBLIC_API_SUMMARY_BOOKINGS as string
     );
-    console.warn("📌 Data summary booking:", res);
-    return res.data; 
+    const apiData = res.data as any[]; // data mentah
+
+    // map API ke model SummaryBooking
+    return apiData.map((item) => ({
+      id: item.id,
+      period: item.period,
+      createdAt: item.createdAt,
+      offices: item.data.map((office: any): SummaryOffice => ({
+        id: crypto.randomUUID(), // karena API tidak ada id untuk office
+        officeName: office.officeName,
+        rooms: office.detailSummary.map((room: any): SummaryRoom => ({
+          id: crypto.randomUUID(),
+          roomName: room.roomName,
+          capacity: Number(room.capacity),
+          averageOccupancyPerMonth: Number(room.averageOccupancyPerMonth),
+          consumptions: room.totalConsumption.map((c: any): SummaryConsumption => ({
+            id: crypto.randomUUID(),
+            name: c.name,
+            totalPackage: Number(c.totalPackage),
+            totalPrice: Number(c.totalPrice),
+          })),
+        })),
+      })),
+    }));
   } catch (err) {
     console.error("❌ Error fetching summary bookings:", err);
     throw err;
   }
 };
-// Generate periode 1 tahun penuh (Jan - Dec)
-// Fungsi untuk generate bulan jan-dec 2024
+
+// Generate periode 1 tahun penuh
 const generatePeriods = () => {
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -45,9 +67,7 @@ const HomePage = () => {
       setError(null);
       try {
         const json = await getSummaryBookings();
-        setAllData(json ?? []);
-        console.log("📌 Semua data dari API:", json);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setAllData(json);
       } catch (err: any) {
         setError(err.message || "Terjadi kesalahan");
         setAllData([]);
@@ -75,7 +95,7 @@ const HomePage = () => {
       </div>
       <hr className="my-2" />
 
-      {/* Select Periode */}
+      {/* Filter Periode */}
       <div className="mb-6 flex flex-col gap-2">
         <label className="mr-2 font-medium text-sm text-gray-500">Periode :</label>
         <Select
@@ -94,7 +114,6 @@ const HomePage = () => {
               ))}
             </SelectGroup>
           </SelectContent>
-          
         </Select>
       </div>
 
@@ -126,7 +145,7 @@ const HomePage = () => {
 
       {/* Data */}
       {!loading && !error && filteredData.length > 0 && (
-        <Dashboard data={filteredData} period={period} />
+        <Dashboard data={filteredData[0].offices} period={period} />
       )}
     </section>
   );
