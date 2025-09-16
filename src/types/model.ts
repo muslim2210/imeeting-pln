@@ -20,10 +20,10 @@ export type JenisKonsumsi = {
 
 // Booking (Form Data)
 export type Booking = {
-  id?: string; // opsional kalau dari API
+  id?: string; 
   unitId: string;
   meetingRoomId: string;
-  capacity: number; // auto isi dari room
+  capacity: number; 
   tanggal: string; // format yyyy-mm-dd
   waktuMulai: string; // format HH:mm
   waktuSelesai: string; // format HH:mm
@@ -31,10 +31,10 @@ export type Booking = {
   userId: string;
   jenisKonsumsi: JenisKonsumsi[];
   nominal: number;
-  unit: Unit;
-  meetingRoom: MeetingRoom;
-  user: User;
-  konsumsi: BookingKonsumsi[];
+  unit?: Unit;
+  meetingRoom?: MeetingRoom;
+  user?: User;
+  konsumsi?: BookingKonsumsi[];
 };
 
 export type User = {
