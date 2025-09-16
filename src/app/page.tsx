@@ -9,7 +9,7 @@ import Image from "next/image";
 // Ambil semua data summary booking
 const getSummaryBookings = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summary-bookings`);
+    const res = await fetch(`${process.env.API_SUMMARY_BOOKINGS}`, { cache: "no-cache" });
     if (!res.ok) throw new Error("Gagal fetch data");
     return await res.json();
   } catch (err) {
@@ -42,7 +42,7 @@ const HomePage = () => {
       setError(null);
       try {
         const json = await getSummaryBookings();
-        setAllData(json.data ?? []);
+        setAllData(json ?? []);
         console.log("📌 Semua data dari API:", json);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
