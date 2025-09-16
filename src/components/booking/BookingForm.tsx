@@ -72,10 +72,10 @@ export function BookingForm() {
     if (form.watch('unitId')) {
       axios.get('/api/master-meeting-rooms')
         .then(res => {
-          console.warn("📌 Semua rooms:", res)
+          console.log("📌 Semua rooms:", res)
           const filtered = res.data.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
           setRooms(filtered)
-          console.warn("📌 Rooms:", filtered)
+          console.log("📌 Rooms:", filtered)
         })
     }
   }, [form.watch('unitId')])

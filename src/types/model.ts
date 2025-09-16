@@ -31,6 +31,10 @@ export type Booking = {
   userId: string;
   jenisKonsumsi: JenisKonsumsi[];
   nominal: number;
+  unit: Unit;
+  meetingRoom: MeetingRoom;
+  user: User;
+  konsumsi: BookingKonsumsi[];
 };
 
 export type User = {
@@ -48,6 +52,7 @@ export type BookingKonsumsi = {
   id: string;
   bookingId: string;
   jenisKonsumsiId: string;
+  jenisKonsumsi: JenisKonsumsi;
 };
 
 export interface AuthContextType {

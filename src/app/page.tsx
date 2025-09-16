@@ -43,7 +43,7 @@ const HomePage = () => {
       try {
         const json = await getSummaryBookings();
         setAllData(json.data ?? []);
-        console.warn("📌 Semua data dari API:", json);
+        console.log("📌 Semua data dari API:", json);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err.message || "Terjadi kesalahan");

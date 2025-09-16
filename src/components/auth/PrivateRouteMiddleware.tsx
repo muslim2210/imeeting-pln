@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useHydratedStore } from "@/hooks/useHydratedStore";
+import Loader from "../ui/Loader";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -29,7 +30,7 @@ export default function PrivateRouteMiddleware({
   }, [isHydrated, user, router, requiredRole]);
 
   // tampilkan loader sementara hydration
-  if (!isHydrated) return <div>Loading...</div>;
+  if (!isHydrated) return <Loader />;
 
   if (!user) return null;
   if (requiredRole && user.role !== requiredRole) return null;
