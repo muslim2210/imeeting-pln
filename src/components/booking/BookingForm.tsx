@@ -61,10 +61,10 @@ export function BookingForm() {
   React.useEffect(() => {
     // get master unit
     axios.get(`${process.env.API_MASTER_UNIT}`)
-      .then(res => setUnits(res.data.data))
+      .then(res => setUnits(res.data))
     // get master jenis konsumsi
     axios.get(`${process.env.API_MASTER_KONSUMSI}`)
-      .then(res => setJenisKonsumsiMaster(res.data.data))
+      .then(res => setJenisKonsumsiMaster(res.data))
   }, [])
 
   // ambil rooms berdasarkan unit
@@ -73,7 +73,7 @@ export function BookingForm() {
       axios.get(`${process.env.API_MASTER_ROOM}`)
         .then(res => {
           console.log("📌 Semua rooms:", res)
-          const filtered = res.data.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
+          const filtered = res.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
           setRooms(filtered)
           console.log("📌 Rooms:", filtered)
         })
