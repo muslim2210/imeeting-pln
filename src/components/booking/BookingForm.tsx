@@ -60,17 +60,17 @@ export function BookingForm() {
 
   React.useEffect(() => {
     // get master unit
-    axios.get('/api/master-units')
+    axios.get(`${process.env.API_MASTER_UNIT}`)
       .then(res => setUnits(res.data.data))
     // get master jenis konsumsi
-    axios.get('/api/master-jenis-konsumsi')
+    axios.get(`${process.env.API_MASTER_KONSUMSI}`)
       .then(res => setJenisKonsumsiMaster(res.data.data))
   }, [])
 
   // ambil rooms berdasarkan unit
   React.useEffect(() => {
     if (form.watch('unitId')) {
-      axios.get('/api/master-meeting-rooms')
+      axios.get(`${process.env.API_MASTER_ROOM}`)
         .then(res => {
           console.log("📌 Semua rooms:", res)
           const filtered = res.data.data.filter((r: MeetingRoom) => r.officeId === form.watch('unitId'))
@@ -147,7 +147,7 @@ export function BookingForm() {
   }
 
   setLoading(true)
-  axios.post('/api/bookings', booking)
+  axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, booking)
     .then(res => {
       if (res.data.success) {
         toast.success('Booking berhasil disimpan')

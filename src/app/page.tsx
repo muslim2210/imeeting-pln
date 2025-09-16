@@ -9,7 +9,7 @@ import Image from "next/image";
 // Ambil semua data summary booking
 const getSummaryBookings = async () => {
   try {
-    const res = await fetch(`/api/summary-bookings`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summary-bookings`);
     if (!res.ok) throw new Error("Gagal fetch data");
     return await res.json();
   } catch (err) {
