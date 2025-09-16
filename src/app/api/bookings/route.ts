@@ -56,6 +56,7 @@ const bookingSchema = z.object({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.warn("📩 Body diterima:", body);
     const parsed = bookingSchema.safeParse(body);
 
     if (!parsed.success) {

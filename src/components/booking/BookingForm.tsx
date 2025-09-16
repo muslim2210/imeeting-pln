@@ -133,20 +133,27 @@ export function BookingForm() {
     return
   }
 
-  const booking: Booking = {
-    unitId: values.unitId,
-    meetingRoomId: values.meetingRoomId,
-    capacity: capacity,
-    tanggal: values.tanggal,
-    waktuMulai: values.waktuMulai,
-    waktuSelesai: values.waktuSelesai,
-    jumlahPeserta: values.jumlahPeserta,
-    jenisKonsumsi: selectedJenis,
-    nominal: nominal,
-    userId: user?.id || '',
-  }
+  const cleanJenisKonsumsi = selectedJenis.map(j => ({
+  id: j.id,
+  name: j.name,
+  maxPrice: j.maxPrice
+}));
+
+const booking: Booking = {
+  unitId: values.unitId,
+  meetingRoomId: values.meetingRoomId,
+  capacity: capacity,
+  tanggal: values.tanggal,
+  waktuMulai: values.waktuMulai,
+  waktuSelesai: values.waktuSelesai,
+  jumlahPeserta: values.jumlahPeserta,
+  jenisKonsumsi: cleanJenisKonsumsi, // ← sudah bersih tanpa createdAt
+  nominal: nominal,
+  userId: user?.id || '',
+};
 
   setLoading(true)
+  console.warn("Booking:", booking)
   axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookings`, booking)
     .then(res => {
       if (res.data.success) {
